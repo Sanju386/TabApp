@@ -1,31 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useContext } from "react";
 import { FaAngleDoubleRight } from "react-icons/fa";
-import { AppContext } from "./Context";
-
+import { useSelector, useDispatch } from "react-redux";
+import { SETDATA, SETCOMPANY } from "./Redux/tabSlice";
 
 const Tab = () => {
-
-  // const [data, setData] = useState([]);
-  // const [company, setCompany] = useState("TOMMY");
- 
-
-  const [state,dispatch] = useContext(AppContext)
-  console.log(state)
- 
-  // const {data,setData,company,setCompany} = App
-
-
- 
+  const tab = useSelector((store) => store.tab);
+  const dispatch = useDispatch();
 
   const fetchData = async () => {
     const response = await fetch("https://course-api.com/react-tabs-project");
 
     const dataList = await response.json();
 
-    // setData(dataList);
-
-   dispatch({type:"SETDATA",payload: dataList})
+    dispatch(SETDATA(dataList));
   };
 
   useEffect(() => {
@@ -33,28 +20,29 @@ const Tab = () => {
   }, []);
 
   const handleBtn = (name) => {
-    // setCompany(name);
-    dispatch({type:"SETCOMPANY", payload: name})
+    dispatch(SETCOMPANY(name));
   };
 
   return (
     <section className="jobs-center">
-
-
       <div className="btn-container">
-        {state.data.map((el) => {
+        {tab.data.map((el) => {
           return (
-            <button onClick={() => handleBtn(el.company)} className={`job-btn ${ el.company === state.company && "active-btn"}`}>
+            <button
+              key={el.id}
+              onClick={() => handleBtn(el.company)}
+              className={`job-btn ${
+                el.company === tab.company && "active-btn"
+              }`}
+            >
               {el.company}
             </button>
           );
         })}
       </div>
 
-
-
-      {state.data
-        .filter((ele) => ele.company === state.company)
+      {tab.data
+        .filter((ele) => ele.company === tab.company)
         .map((item) => {
           return (
             <article key={item.id} className="job-info">
@@ -63,9 +51,10 @@ const Tab = () => {
               <p className="job-date">{item.dates}</p>
 
               {Array.isArray(item.duties) &&
-                item.duties.map((element) => {
+                item.duties.map((element, index) => {
+                  
                   return (
-                    <div key={element} className="job-desc">
+                    <div key={index} className="job-desc">
                       <FaAngleDoubleRight />
                       <p>{element}</p>
                     </div>
